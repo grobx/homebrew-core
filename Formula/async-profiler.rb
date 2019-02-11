@@ -10,12 +10,7 @@ class AsyncProfiler < Formula
     system "make"
 
     libexec.install "build", "profiler.sh"
-
-    (bin/"async-profiler").write <<~EOS
-      #!/bin/bash
-      "#{Formula["async-profiler"].libexec}/profiler.sh" "$@"
-    EOS
-    chmod 0555, bin/"async-profiler"
+    bin.install_symlink libexec/"profiler.sh" => "async-profiler"
   end
 
   test do
