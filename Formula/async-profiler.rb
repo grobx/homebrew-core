@@ -14,6 +14,17 @@ class AsyncProfiler < Formula
   end
 
   test do
-    system bin/"async-profiler", "-v"
+    (testpath/"Test.java").write <<~EOS
+    class Test {
+      public static void main(String[] args) throws InterruptedException {
+        for (int i = 0; i < 42; ++i) { Thread.sleep(100); }
+      }
+    }
+    EOS
+    system "javac #{testpath}/Test.java"
+    pid = Process.spawn("java", "Test", chdir:testpath) 
+    sleep 1
+    system "async-profiler -d 1 -f #{testpath}/flamegraph.svg #{pid}"
+    raise "Profiler output not found" unless File.exists? "#{testpath}/flamegraph.svg"
   end
 end
